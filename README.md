@@ -8,8 +8,8 @@ To use the program just drag the compiled lua file onto the .exe file
 
 ## Credits
 
-DTZxPorter - Original lua disassembler to find the basics
-Scobalula - Utilities
+- DTZxPorter - Original lua disassembler to find the basics
+- Scobalula - Utilities
 
 ## License 
 
