@@ -10,7 +10,7 @@ namespace LuaDecompiler
     {
         static void Main(string[] args)
         {
-            string[] files = args.Where(x => Path.GetExtension(x) == ".lua" && File.Exists(x)).ToArray();
+            string[] files = args.Where(x => (Path.GetExtension(x) == ".lua" || Path.GetExtension(x) == ".luac") && File.Exists(x)).ToArray();
             Console.WriteLine("Bo3/4 Lua Disassembler by JariK");
             LuaFile.errors = 0;
             foreach (string fileName in files)

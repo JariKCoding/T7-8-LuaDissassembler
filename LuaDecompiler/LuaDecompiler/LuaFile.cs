@@ -39,6 +39,7 @@ namespace LuaDecompiler
             public List<LuaString> Strings { get; set; }
             public List<String> DisassebleStrings { get; set; }
             public List<String> UpvalsStrings { get; set; }
+            public List<int> foreachPositions { get; set; }
             public string[] Registers { get; set; }
             
 
@@ -50,6 +51,7 @@ namespace LuaDecompiler
                 subFunctions = new List<LuaFunction>();
                 DisassebleStrings = new List<String>();
                 UpvalsStrings = new List<String>();
+                foreachPositions = new List<int>();
                 Registers = new string[registerCount];
                 for (int i = 0; i < registerCount; i++)
                     Registers[i] = "";
@@ -124,6 +126,14 @@ namespace LuaDecompiler
         {
             public StringType StringType { get; set; }
             public string String { get; set; }
+
+            public string getString()
+            {
+                if (StringType == StringType.String)
+                    return "\"" + String + "\"";
+                else
+                    return String;
+            }
         }
 
         public List<LuaFunction> Functions { get; set;}
@@ -417,16 +427,15 @@ namespace LuaDecompiler
                                 }
                                 else if (opCode.A == 2)
                                 {
-                                    function.DisassebleStrings.Add(String.Format("r({0}).upval({1}) = {2}.r({3}) // {4}",
+                                    function.DisassebleStrings.Add(String.Format("r({0}).upval({1}) = upval({2}) // {3}",
                                         function.doingUpvals,
                                         function.subFunctions[function.lastFunctionClosure].UpvalsStrings.Count,
-                                        function.superFunction.getName(),
                                         opCode.C,
-                                        function.superFunction.Registers[opCode.C]));
+                                        function.UpvalsStrings[opCode.C]));
                                 }
                                 else
                                 {
-                                    Console.WriteLine("Trying to get to superfunction on level " + opCode.A);
+                                    Console.WriteLine("Trying to get to do upvalue on level " + opCode.A);
                                     errors++;
                                 }
                             }
@@ -449,7 +458,7 @@ namespace LuaDecompiler
                                 opCode.OPCode));
                             break;
                     }
-                    if (opCode.OPCode == 0xF)
+                    if (opCode.OPCode == 0xF && function.toString() == "__INIT__")
                     {
                         if (this.game == Game.BlackOps4 && function.Registers[opCode.A].Length > 3)
                         {
@@ -472,7 +481,7 @@ namespace LuaDecompiler
                             }  
                             else if(opCode.A == 2)
                             {   
-                                function.subFunctions[function.lastFunctionClosure].UpvalsStrings.Add(function.superFunction.Registers[opCode.C]);
+                                function.subFunctions[function.lastFunctionClosure].UpvalsStrings.Add(function.UpvalsStrings[opCode.C]);
                             }
                         }
                         else

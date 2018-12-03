@@ -44,7 +44,7 @@ namespace LuaDecompiler
                 {
                     parameterRegisters += ", " + j;
                 }
-                if (funcName.Contains(":"))
+                if (funcName.Contains(":") && opCode.A + 2 <= opCode.A + parameterCount)
                 {
                     parametersString += function.Registers[opCode.A + 2];
                     for (int j = opCode.A + 3; j <= opCode.A + parameterCount; j++)

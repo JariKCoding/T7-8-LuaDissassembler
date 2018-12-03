@@ -13,12 +13,19 @@ namespace LuaDecompiler
             if (index > 0)
             {
                 if(function.OPCodes[index - 1].OPCode == 0x16)
-                {
-                    opCode.A = 0;
-                }
+                    opCode.B = 1;
             }
-            if (opCode.A > 0)
-                function.DisassebleStrings.Add(String.Format("return r({0}) // {1}", opCode.A, function.Registers[opCode.A]));
+            if (opCode.B > 1)
+            {
+                string registers = opCode.A.ToString();
+                string returns = function.Registers[opCode.A];
+                for(int i = opCode.A + 1; i <= opCode.A + opCode.B - 2; i++)
+                {
+                    registers += ", " + i;
+                    returns += ", " + function.Registers[i];
+                }
+                function.DisassebleStrings.Add(String.Format("return r({0}) // {1}", registers, returns));
+            } 
             else
                 function.DisassebleStrings.Add("return");
         }

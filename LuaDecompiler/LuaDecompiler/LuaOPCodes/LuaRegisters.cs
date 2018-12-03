@@ -28,7 +28,7 @@ namespace LuaDecompiler
             function.DisassebleStrings.Add(String.Format("r({0}) = g[{1}] // {2}",
                 opCode.A,
                 opCode.Bx,
-                (function.Strings[opCode.Bx].StringType == LuaFile.StringType.String) ? "\"" + function.Registers[opCode.A] + "\"" : function.Registers[opCode.A]));
+                function.Strings[opCode.Bx].getString()));
         }
 
         public static void RegisterToGlobal(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
@@ -46,9 +46,10 @@ namespace LuaDecompiler
                 function.Registers[opCode.A] = "false";
             else
                 function.Registers[opCode.A] = "true";
-            function.DisassebleStrings.Add(String.Format("r({0}) = {1}",
+            function.DisassebleStrings.Add(String.Format("r({0}) = {1}{2}",
                 opCode.A,
-                function.Registers[opCode.A]));
+                function.Registers[opCode.A],
+                (opCode.C == 1) ? " // skip next opcode" : ""));
         }
 
         public static void NilToRegister(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
@@ -65,10 +66,7 @@ namespace LuaDecompiler
 
         public static void LocalConstantToRegister(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
-            if (function.Strings[opCode.Bx].StringType == LuaFile.StringType.String)
-                function.Registers[opCode.A] = "\"" + function.Strings[opCode.Bx].String + "\"";
-            else
-                function.Registers[opCode.A] = function.Strings[opCode.Bx].String;
+            function.Registers[opCode.A] = function.Strings[opCode.Bx].getString();
             function.DisassebleStrings.Add(String.Format("r({0}) = c[{1}] // {2}",
                 opCode.A,
                 opCode.Bx,

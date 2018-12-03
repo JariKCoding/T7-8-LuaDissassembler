@@ -36,10 +36,6 @@ namespace LuaDecompiler
 
         public static void StartForEachLoop(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
-
-            /*function.Registers[opCode.A + 3] = "index" + ((function.forLoopCount > 0) ? function.forLoopCount.ToString() : "");
-            function.Registers[opCode.A + 4] = "value" + ((function.forLoopCount > 0) ? function.forLoopCount.ToString() : "");*/
-            function.forLoopCount++;
             function.DisassebleStrings.Add(String.Format("Start a foreach loop with val r({0}), stop: r({1}), inc: r({2}) // use these values: {3} and {4}",
                 opCode.A,
                 opCode.A + 1,

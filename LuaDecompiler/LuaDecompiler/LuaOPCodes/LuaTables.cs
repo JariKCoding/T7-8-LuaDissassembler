@@ -40,7 +40,7 @@ namespace LuaDecompiler
                     opCode.C - 256,
                     function.Registers[opCode.A],
                     function.Registers[opCode.B],
-                    (function.Strings[opCode.C - 256].StringType == LuaFile.StringType.String) ? "\"" + function.Strings[opCode.C - 256].String + "\"" : function.Strings[opCode.C - 256].String));
+                    function.Strings[opCode.C - 256].getString()));
             }
             else
             {
