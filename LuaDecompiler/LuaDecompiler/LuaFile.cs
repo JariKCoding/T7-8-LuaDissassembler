@@ -129,7 +129,7 @@ namespace LuaDecompiler
 
             public string getString()
             {
-                if (StringType == StringType.String)
+                if (StringType == StringType.String && String != "nil")
                     return "\"" + String + "\"";
                 else
                     return String;
@@ -358,8 +358,8 @@ namespace LuaDecompiler
                     {
                         case 0x0: LuaStrings.ConnectWithDot(function, opCode); break;
                         case 0x1: LuaConditions.IfIsTrueFalse(function, opCode); break;
-                        case 0x2: case 0x4C: LuaFunctions.CallFunctionWithParameters(function, opCode); break;
-                        case 0x16: LuaFunctions.CallFunctionWithParameters(function, opCode, true); break;
+                        case 0x2: case 0x4C: LuaFunctions.CallFunctionWithParameters(function, opCode, i); break;
+                        case 0x16: LuaFunctions.CallFunctionWithParameters(function, opCode, i, true); break;
                         case 0x4: LuaConditions.IfIsEqual(function, opCode); break;
                         case 0x5: LuaConditions.IfIsEqualBackwards(function, opCode); break;
                         case 0x6: LuaRegisters.GlobalRegisterToRegister(function, opCode); break;

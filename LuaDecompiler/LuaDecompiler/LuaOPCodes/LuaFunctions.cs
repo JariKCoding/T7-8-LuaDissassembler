@@ -28,7 +28,7 @@ namespace LuaDecompiler
                 function.UpvalsStrings[opCode.B]));
         }
 
-        public static void CallFunctionWithParameters(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode, bool tailCall = false)
+        public static void CallFunctionWithParameters(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode, int index, bool tailCall = false)
         {
             string funcName = function.Registers[opCode.A];
             int parameterCount = opCode.B - 1;
@@ -61,6 +61,26 @@ namespace LuaDecompiler
                     }
                 }
             }
+            else
+            {
+                parameterRegisters += opCode.A + 1;
+                for (int j = opCode.A + 2; j <= function.OPCodes[index - 1].A; j++)
+                {
+                    parameterRegisters += ", " + j;
+                }
+                
+                int startpoint = 2;
+                parametersString = function.Registers[opCode.A + 1];
+                if (funcName.Contains(":"))
+                {
+                    parametersString = function.Registers[opCode.A + 2];
+                    startpoint = 3;
+                }
+                for (int j = opCode.A + startpoint; j <= function.OPCodes[index - 1].A; j++)
+                {
+                    parametersString += ", " + function.Registers[j];
+                }
+            }
             if (returnValues > 0)
             {
                 string returnRegisters = opCode.A.ToString();
@@ -87,6 +107,7 @@ namespace LuaDecompiler
             }
             else
             {
+                function.Registers[opCode.A] = funcName + "(" + parametersString + ")";
                 function.DisassebleStrings.Add(String.Format("{5}call r({0}) with r({1}) // {3}({4})",
                     opCode.A,
                     parameterRegisters,
