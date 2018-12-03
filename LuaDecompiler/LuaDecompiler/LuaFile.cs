@@ -37,7 +37,7 @@ namespace LuaDecompiler
             public List<LuaFunction> subFunctions { get; set; }
             public List<LuaOPCode> OPCodes { get; set; }
             public List<LuaString> Strings { get; set; }
-            public List<String> DisassebleStrings { get; set; }
+            public List<String> DisassembleStrings { get; set; }
             public List<String> UpvalsStrings { get; set; }
             public List<int> foreachPositions { get; set; }
             public string[] Registers { get; set; }
@@ -49,7 +49,7 @@ namespace LuaDecompiler
                 OPCodes = new List<LuaOPCode>();
                 Strings = new List<LuaString>();
                 subFunctions = new List<LuaFunction>();
-                DisassebleStrings = new List<String>();
+                DisassembleStrings = new List<String>();
                 UpvalsStrings = new List<String>();
                 foreachPositions = new List<int>();
                 Registers = new string[registerCount];
@@ -60,6 +60,11 @@ namespace LuaDecompiler
                 forLoopCount = 0;
                 forLoopCount = -1;
                 lastFunctionClosure = -1;
+            }
+
+            public string getNewReturnVal()
+            {
+                return "returnval" + this.returnValCount++;
             }
 
             public string getName()
@@ -90,7 +95,7 @@ namespace LuaDecompiler
                         (this.Strings[i].StringType == StringType.String) ? "\"" + this.Strings[i].String + "\"" : this.Strings[i].String, 
                         this.Strings[i].StringType);
                 }
-                foreach(String DisassembleString in this.DisassebleStrings)
+                foreach(String DisassembleString in this.DisassembleStrings)
                 {
                     output += "\n\t" + DisassembleString;
                 }
@@ -346,7 +351,7 @@ namespace LuaDecompiler
             for (int i = 0; i < function.parameterCount; i++)
             {
                 function.Registers[i] = "arg" + i;
-                function.DisassebleStrings.Add(String.Format("r({0}) = arg{0}",
+                function.DisassembleStrings.Add(String.Format("r({0}) = arg{0}",
                             i));
             }
             for (int i = 0; i < function.OPCodes.Count; i++)
@@ -391,6 +396,7 @@ namespace LuaDecompiler
                         case 0x32: LuaOperators.Power(function, opCode); break;
                         case 0x33: LuaOperators.PowerBackWards(function, opCode); break;
                         case 0x34: LuaTables.EmptyTable(function, opCode); break;
+                        case 0x35: LuaOperators.UnaryMinus(function, opCode); break;
                         case 0x36: LuaConditions.Not(function, opCode); break;
                         case 0x37: LuaOperators.Length(function, opCode); break;
                         case 0x38: LuaConditions.LargerThan(function, opCode); break;
@@ -419,7 +425,7 @@ namespace LuaDecompiler
                             {
                                 if(opCode.A == 1)
                                 {
-                                    function.DisassebleStrings.Add(String.Format("r({0}).upval({1}) = r({2}) // {3}",
+                                    function.DisassembleStrings.Add(String.Format("r({0}).upval({1}) = r({2}) // {3}",
                                         function.doingUpvals,
                                         function.subFunctions[function.lastFunctionClosure].UpvalsStrings.Count,
                                         opCode.C,
@@ -427,7 +433,7 @@ namespace LuaDecompiler
                                 }
                                 else if (opCode.A == 2)
                                 {
-                                    function.DisassebleStrings.Add(String.Format("r({0}).upval({1}) = upval({2}) // {3}",
+                                    function.DisassembleStrings.Add(String.Format("r({0}).upval({1}) = upval({2}) // {3}",
                                         function.doingUpvals,
                                         function.subFunctions[function.lastFunctionClosure].UpvalsStrings.Count,
                                         opCode.C,
@@ -441,7 +447,7 @@ namespace LuaDecompiler
                             }
                             else
                             {
-                                function.DisassebleStrings.Add(String.Format("data({0}, {1}, {2}, {3})",
+                                function.DisassembleStrings.Add(String.Format("data({0}, {1}, {2}, {3})",
                                     opCode.A,
                                     opCode.C,
                                     opCode.B,
@@ -449,7 +455,7 @@ namespace LuaDecompiler
                             }
                             break;
                         default:
-                            function.DisassebleStrings.Add(String.Format("Unknown data(A:{0}, B:{1}, C:{2}, Bx:{3}, sBx:{4}, X:{5})",
+                            function.DisassembleStrings.Add(String.Format("Unknown data(A:{0}, B:{1}, C:{2}, Bx:{3}, sBx:{4}, X:{5})",
                                 opCode.A,
                                 opCode.B,
                                 opCode.C,

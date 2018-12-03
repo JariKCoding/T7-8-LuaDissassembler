@@ -12,7 +12,7 @@ namespace LuaDecompiler
         {
             function.Registers[opCode.A + 3] = "index" + ((function.forLoopCount > 0) ? function.forLoopCount.ToString() : "");
             function.forLoopCount++;
-            function.DisassebleStrings.Add(String.Format("for {6}=r({0}), {6} < r({1}), r({2}) do // for {6}={3}, {4}, {5} do",
+            function.DisassembleStrings.Add(String.Format("for {6}=r({0}), {6} < r({1}), r({2}) do // for {6}={3}, {4}, {5} do",
                 opCode.A, opCode.A + 1, opCode.A + 2,
                 function.Registers[opCode.A],
                 function.Registers[opCode.A + 1],
@@ -24,19 +24,19 @@ namespace LuaDecompiler
         {
             if (opCode.B == 0)
             {
-                function.DisassebleStrings.Add(String.Format("skip the next [{0}] opcodes // advance {0} lines",
+                function.DisassembleStrings.Add(String.Format("skip the next [{0}] opcodes // advance {0} lines",
                 opCode.C + 1));
             }
             else
             {
-                function.DisassebleStrings.Add(String.Format("skip the next [{0}] opcodes // advance {0} lines",
+                function.DisassembleStrings.Add(String.Format("skip the next [{0}] opcodes // advance {0} lines",
                     opCode.sBx));
             }   
         }
 
         public static void StartForEachLoop(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
-            function.DisassebleStrings.Add(String.Format("Start a foreach loop with val r({0}), stop: r({1}), inc: r({2}) // use these values: {3} and {4}",
+            function.DisassembleStrings.Add(String.Format("Start a foreach loop with val r({0}), stop: r({1}), inc: r({2}) // use these values: {3} and {4}",
                 opCode.A,
                 opCode.A + 1,
                 opCode.A + 2,

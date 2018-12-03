@@ -24,16 +24,16 @@ namespace LuaDecompiler
                     registers += ", " + i;
                     returns += ", " + function.Registers[i];
                 }
-                function.DisassebleStrings.Add(String.Format("return r({0}) // {1}", registers, returns));
+                function.DisassembleStrings.Add(String.Format("return r({0}) // {1}", registers, returns));
             } 
             else
-                function.DisassebleStrings.Add("return");
+                function.DisassembleStrings.Add("return");
         }
 
         public static void Length(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
             function.Registers[opCode.A] = "#" + function.Registers[opCode.B];
-            function.DisassebleStrings.Add(String.Format("r({0}) = len(r({1})) // {2}",
+            function.DisassembleStrings.Add(String.Format("r({0}) = len(r({1})) // {2}",
                 opCode.A,
                 opCode.B,
                 function.Registers[opCode.B]));
@@ -103,7 +103,7 @@ namespace LuaDecompiler
         {
             if (opCode.C > 255)
             {
-                function.DisassebleStrings.Add(String.Format("r({0}) = c[{1}] {6} r({2}) // {3} = {4} {6} {5}",
+                function.DisassembleStrings.Add(String.Format("r({0}) = c[{1}] {6} r({2}) // {3} = {4} {6} {5}",
                     opCode.A,
                     opCode.C - 256,
                     opCode.B,
@@ -114,7 +114,7 @@ namespace LuaDecompiler
             }
             else
             {
-                function.DisassebleStrings.Add(String.Format("r({0}) = r({1}) {6} r({2}) // {3} = {4} {6} {5}",
+                function.DisassembleStrings.Add(String.Format("r({0}) = r({1}) {6} r({2}) // {3} = {4} {6} {5}",
                     opCode.A,
                     opCode.C,
                     opCode.B,
@@ -124,15 +124,13 @@ namespace LuaDecompiler
                     Operator));
             }
 
-            function.Registers[opCode.A] = "returnval" + function.returnValCount;
-            function.returnValCount++;
+            function.Registers[opCode.A] = function.getNewReturnVal();
         }
 
         public static void DoOperatorBackWards(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode, string Operator)
         {
-            function.Registers[opCode.A] = "returnval" + function.returnValCount;
-            function.returnValCount++;
-            function.DisassebleStrings.Add(String.Format("r({0}) = r({1}) {6} c({2}) // {3} = {4} {6} {5}",
+            function.Registers[opCode.A] = function.getNewReturnVal();
+            function.DisassembleStrings.Add(String.Format("r({0}) = r({1}) {6} c({2}) // {3} = {4} {6} {5}",
                 opCode.A,
                 opCode.C,
                 opCode.B,
@@ -142,49 +140,58 @@ namespace LuaDecompiler
                 Operator));
         }
 
+        public static void UnaryMinus(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
+        {
+            function.Registers[opCode.A] = "-" + function.Registers[opCode.A];
+            function.DisassembleStrings.Add(String.Format("r({0}) = -r({1}) // {2} ",
+                opCode.A,
+                opCode.B,
+                function.Registers[opCode.A]));
+        }
+
         public static void ShiftLeft(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
-            function.DisassebleStrings.Add("; Unhandled OP: (OPCODE_LEFT_SHIFT)");
+            function.DisassembleStrings.Add("; Unhandled OP: (OPCODE_LEFT_SHIFT)");
         }
 
         public static void ShiftLeftBackwards(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
-            function.DisassebleStrings.Add("; Unhandled OP: (OPCODE_LEFT_SHIFT_BK)");
+            function.DisassembleStrings.Add("; Unhandled OP: (OPCODE_LEFT_SHIFT_BK)");
         }
 
         public static void BinaryAnd(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
-            function.DisassebleStrings.Add("; Unhandled OP: (OPCODE_BIT_AND)");
+            function.DisassembleStrings.Add("; Unhandled OP: (OPCODE_BIT_AND)");
         }
 
         public static void BinaryOr(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
-            function.DisassebleStrings.Add("; Unhandled OP: (OPCODE_BIT_OR)");
+            function.DisassembleStrings.Add("; Unhandled OP: (OPCODE_BIT_OR)");
         }
 
         public static void TestSet(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
-            function.DisassebleStrings.Add("; Unhandled OP: (OPCODE_TESTSET)");
+            function.DisassembleStrings.Add("; Unhandled OP: (OPCODE_TESTSET)");
         }
 
         public static void Close(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
-            function.DisassebleStrings.Add("; Unhandled OP: (OPCODE_CLOSE)");
+            function.DisassembleStrings.Add("; Unhandled OP: (OPCODE_CLOSE)");
         }
 
         public static void VarArg(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
-            function.DisassebleStrings.Add("; Unhandled OP: (OPCODE_VARARG)");
+            function.DisassembleStrings.Add("; Unhandled OP: (OPCODE_VARARG)");
         }
 
         public static void NotR1(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
-            function.DisassebleStrings.Add("; Unhandled OP: (OPCODE_NOT_R1)");
+            function.DisassembleStrings.Add("; Unhandled OP: (OPCODE_NOT_R1)");
         }
 
         public static void SetupVal(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
-            function.DisassebleStrings.Add("; Unhandled OP: (OPCODE_SETUPVAL)");
+            function.DisassembleStrings.Add("; Unhandled OP: (OPCODE_SETUPVAL)");
         }
     }
 }

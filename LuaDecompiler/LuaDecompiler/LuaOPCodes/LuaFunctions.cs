@@ -13,7 +13,7 @@ namespace LuaDecompiler
             function.Registers[opCode.A] = String.Format("__FUNC_{0:X}_", function.subFunctions[opCode.Bx].beginPosition);
             function.doingUpvals = opCode.A;
             function.lastFunctionClosure = opCode.Bx;
-            function.DisassebleStrings.Add(String.Format("r({0}) = closure({1}) // {2}",
+            function.DisassembleStrings.Add(String.Format("r({0}) = closure({1}) // {2}",
                 opCode.A,
                 opCode.Bx,
                 function.Registers[opCode.A]));
@@ -22,7 +22,7 @@ namespace LuaDecompiler
         public static void GetUpValue(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
             function.Registers[opCode.A] = function.UpvalsStrings[opCode.B];
-            function.DisassebleStrings.Add(String.Format("r({0}) = upval({1}) // {2}",
+            function.DisassembleStrings.Add(String.Format("r({0}) = upval({1}) // {2}",
                 opCode.A,
                 opCode.B,
                 function.UpvalsStrings[opCode.B]));
@@ -34,7 +34,11 @@ namespace LuaDecompiler
             int parameterCount = opCode.B - 1;
             int returnValues = opCode.C - 1;
             if (returnValues < 0)
+            {
                 returnValues = 0;
+                tailCall = true;
+            }
+                
             string parameterRegisters = "";
             string parametersString = "";
             if (parameterCount > 0)
@@ -85,19 +89,17 @@ namespace LuaDecompiler
             {
                 string returnRegisters = opCode.A.ToString();
                 string returnStrings = "returnval" + function.returnValCount;
-                function.Registers[opCode.A] = "returnval" + function.returnValCount;
-                function.returnValCount++;
+                function.Registers[opCode.A] = function.getNewReturnVal();
                 if (returnValues > 1)
                 {
                     for (int j = opCode.A + 1; j < opCode.A + returnValues; j++)
                     {
                         returnRegisters += ", " + j.ToString();
                         returnStrings += ", returnval" + function.returnValCount;
-                        function.Registers[j] = "returnval" + function.returnValCount;
-                        function.returnValCount++;
+                        function.Registers[j] = function.getNewReturnVal();
                     }
                 }
-                function.DisassebleStrings.Add(String.Format("r({0}) = call r({1}) with r({2}) // {3} = {4}({5})",
+                function.DisassembleStrings.Add(String.Format("r({0}) = call r({1}) with r({2}) // {3} = {4}({5})",
                     returnRegisters,
                     opCode.A,
                     parameterRegisters,
@@ -108,7 +110,7 @@ namespace LuaDecompiler
             else
             {
                 function.Registers[opCode.A] = funcName + "(" + parametersString + ")";
-                function.DisassebleStrings.Add(String.Format("{5}call r({0}) with r({1}) // {3}({4})",
+                function.DisassembleStrings.Add(String.Format("{5}call r({0}) with r({1}) // {3}({4})",
                     opCode.A,
                     parameterRegisters,
                     function.Registers[opCode.A],
@@ -123,39 +125,35 @@ namespace LuaDecompiler
             if (opCode.C > 1)
             {
                 string returnRegisters = opCode.A.ToString();
-                string returnStrings = "returnval" + function.returnValCount;
-                function.returnValCount++;
+                string returnStrings = function.getNewReturnVal();
                 if (opCode.C > 2)
                 {
                     for (int j = opCode.A + 1; j < opCode.A + opCode.C - 1; j++)
                     {
                         returnRegisters += ", " + j.ToString();
                         returnStrings += ", returnval" + function.returnValCount;
-                        function.Registers[j] = "returnval" + function.returnValCount;
-                        function.returnValCount++;
+                        function.Registers[j] = function.getNewReturnVal();
                     }
                 }
-                function.DisassebleStrings.Add(String.Format("r({0}) = call r({1}) // {2} = {3}()",
+                function.DisassembleStrings.Add(String.Format("r({0}) = call r({1}) // {2} = {3}()",
                     returnRegisters,
                     opCode.A,
                     returnStrings,
                     function.Registers[opCode.A]));
                 for (int j = opCode.A; j < opCode.A + opCode.C - 1; j++)
                     function.returnValCount--;
-                function.Registers[opCode.A] = "returnval" + function.returnValCount;
-                function.returnValCount++;
+                function.Registers[opCode.A] = function.getNewReturnVal();
                 if (opCode.C > 2)
                 {
                     for (int j = opCode.A + 1; j < opCode.A + opCode.C - 1; j++)
                     {
-                        function.Registers[j] = "returnval" + function.returnValCount;
-                        function.returnValCount++;
+                        function.Registers[j] = function.getNewReturnVal();
                     }
                 }
             }
             else
             {
-                function.DisassebleStrings.Add(String.Format("call r({0}) // {1}()",
+                function.DisassembleStrings.Add(String.Format("call r({0}) // {1}()",
                     opCode.A,
                     function.Registers[opCode.A]));
             }

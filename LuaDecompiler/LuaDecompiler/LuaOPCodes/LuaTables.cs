@@ -13,7 +13,7 @@ namespace LuaDecompiler
             if (opCode.C > 255)
             {
                 function.Registers[opCode.A] = function.Registers[opCode.B] + "[" + function.Strings[opCode.C - 256].String + "]";
-                function.DisassebleStrings.Add(String.Format("r({0}) = r({1})[c[{2}]] // {3}",
+                function.DisassembleStrings.Add(String.Format("r({0}) = r({1})[c[{2}]] // {3}",
                     opCode.A,
                     opCode.B,
                     opCode.C - 256,
@@ -22,7 +22,7 @@ namespace LuaDecompiler
             else
             {
                 function.Registers[opCode.A] = function.Registers[opCode.B] + "[" + function.Registers[opCode.C] + "]";
-                function.DisassebleStrings.Add(String.Format("r({0}) = r({1})[r({2})] // {3}",
+                function.DisassembleStrings.Add(String.Format("r({0}) = r({1})[r({2})] // {3}",
                     opCode.A,
                     opCode.B,
                     opCode.C,
@@ -34,7 +34,7 @@ namespace LuaDecompiler
         {
             if (opCode.C > 255)
             {
-                function.DisassebleStrings.Add(String.Format("r({0})[c[{1}]] = c[{2}] // {3}[{4}] = {5}",
+                function.DisassembleStrings.Add(String.Format("r({0})[c[{1}]] = c[{2}] // {3}[{4}] = {5}",
                     opCode.A,
                     opCode.B,
                     opCode.C - 256,
@@ -44,7 +44,7 @@ namespace LuaDecompiler
             }
             else
             {
-                function.DisassebleStrings.Add(String.Format("r({0})[c[{1}]] = c[{2}] // {3}[{4}] = {5}",
+                function.DisassembleStrings.Add(String.Format("r({0})[c[{1}]] = c[{2}] // {3}[{4}] = {5}",
                     opCode.A,
                     opCode.B,
                     opCode.C,
@@ -56,14 +56,14 @@ namespace LuaDecompiler
 
         public static void SetTableBackwards(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
-            function.DisassebleStrings.Add("; Unhandled OP: (OPCODE_SETTABLE_S_BK)");
+            function.DisassembleStrings.Add("; Unhandled OP: (OPCODE_SETTABLE_S_BK)");
         }
 
         public static void EmptyTable(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
             function.Registers[opCode.A] = "table" + function.tableCount;
             function.tableCount++;
-            function.DisassebleStrings.Add(String.Format("r({0}) = {4} // {3} = {4} Index: {2} Hash: {1}",
+            function.DisassembleStrings.Add(String.Format("r({0}) = {4} // {3} = {4} Index: {2} Hash: {1}",
                 opCode.A,
                 opCode.C,
                 opCode.B,
@@ -90,7 +90,7 @@ namespace LuaDecompiler
             tableString += "}";
             function.Registers[opCode.A] = function.Registers[opCode.A];
 
-            function.DisassebleStrings.Add(String.Format("r({0}) = r({1}) // {2} = {3}",
+            function.DisassembleStrings.Add(String.Format("r({0}) = r({1}) // {2} = {3}",
                 opCode.A,
                 tableRegisters,
                 function.Registers[opCode.A],

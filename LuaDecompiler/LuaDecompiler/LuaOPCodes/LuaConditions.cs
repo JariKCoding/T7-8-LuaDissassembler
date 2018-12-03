@@ -10,7 +10,7 @@ namespace LuaDecompiler
     {
         public static void IfIsTrueFalse(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
-            function.DisassebleStrings.Add(String.Format("if r({0}) == {1}, skip next opcode // if {2}{3} then skip next line",
+            function.DisassembleStrings.Add(String.Format("if r({0}) == {1}, skip next opcode // if {2}{3} then skip next line",
                 opCode.A,
                 (opCode.C == 1) ? "false" : "true",
                 (opCode.C == 1) ? "not " : "",
@@ -21,7 +21,7 @@ namespace LuaDecompiler
         {
             if(opCode.C > 255)
             {
-                function.DisassebleStrings.Add(String.Format("if {4}r({0}) == c[{1}], skip next opcode // if {4}{2} == {3} then skip next line",
+                function.DisassembleStrings.Add(String.Format("if {4}r({0}) == c[{1}], skip next opcode // if {4}{2} == {3} then skip next line",
                     opCode.B,
                     opCode.C - 256,
                     function.Registers[opCode.B],
@@ -30,7 +30,7 @@ namespace LuaDecompiler
             }
             else
             {
-                function.DisassebleStrings.Add(String.Format("if {4}r({0}) == r({1}), skip next opcode // if {4}{2} == {3} then skip next line",
+                function.DisassembleStrings.Add(String.Format("if {4}r({0}) == r({1}), skip next opcode // if {4}{2} == {3} then skip next line",
                     opCode.B,
                     opCode.C,
                     function.Registers[opCode.B],
@@ -53,7 +53,7 @@ namespace LuaDecompiler
                     suffix = " + start of foreach loop";
                     function.foreachPositions.Add(index + opCode.C + 2);
                 }
-                function.DisassebleStrings.Add(String.Format("skip the next [{0}] opcodes // advance {0} lines{1}",
+                function.DisassembleStrings.Add(String.Format("skip the next [{0}] opcodes // advance {0} lines{1}",
                     opCode.C + 1,
                     suffix));
             }
@@ -68,7 +68,7 @@ namespace LuaDecompiler
                     suffix = " + start of foreach loop";
                     function.foreachPositions.Add(index + opCode.sBx + 1);
                 }
-                function.DisassebleStrings.Add(String.Format("skip the next [{0}] opcodes // advance {0} lines",
+                function.DisassembleStrings.Add(String.Format("skip the next [{0}] opcodes // advance {0} lines",
                     opCode.sBx));
             }
             
@@ -77,25 +77,24 @@ namespace LuaDecompiler
 
         public static void Not(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
-            function.DisassebleStrings.Add(String.Format("r({0}) = not r({1}) // {2} = not {3}",
+            function.DisassembleStrings.Add(String.Format("r({0}) = not r({1}) // {2} = not {3}",
                 opCode.A,
                 opCode.B,
                 "returnval" + function.returnValCount,
                 function.Registers[opCode.B]));
-            function.Registers[opCode.A] = "returnval" + function.returnValCount;
-            function.returnValCount++;
+            function.Registers[opCode.A] = function.getNewReturnVal();
         }
 
         public static void IfIsEqualBackwards(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
-            function.DisassebleStrings.Add("; Unhandled OP: (OPCODE_EQ_BK)");
+            function.DisassembleStrings.Add("; Unhandled OP: (OPCODE_EQ_BK)");
         }
 
         public static void LargerThan(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
             if (opCode.C > 255)
             {
-                function.DisassebleStrings.Add(String.Format("if {4}r({0}) > c[{1}], skip next opcode // if {4}{2} > {3} then skip next line",
+                function.DisassembleStrings.Add(String.Format("if {4}r({0}) > c[{1}], skip next opcode // if {4}{2} > {3} then skip next line",
                     opCode.B,
                     opCode.C - 256,
                     function.Registers[opCode.B],
@@ -104,7 +103,7 @@ namespace LuaDecompiler
             }
             else
             {
-                function.DisassebleStrings.Add(String.Format("if {4}r({0}) > r({1}), skip next opcode // if {4}{2} > {3} then skip next line",
+                function.DisassembleStrings.Add(String.Format("if {4}r({0}) > r({1}), skip next opcode // if {4}{2} > {3} then skip next line",
                     opCode.B,
                     opCode.C,
                     function.Registers[opCode.B],
@@ -117,7 +116,7 @@ namespace LuaDecompiler
         {
             if (opCode.C > 255)
             {
-                function.DisassebleStrings.Add(String.Format("if {4}r({0}) > c[{1}], skip next opcode // if {4}{2} > {3} then skip next line",
+                function.DisassembleStrings.Add(String.Format("if {4}r({0}) > c[{1}], skip next opcode // if {4}{2} > {3} then skip next line",
                     opCode.B,
                     opCode.C - 256,
                     function.Strings[opCode.B].getString(),
@@ -126,7 +125,7 @@ namespace LuaDecompiler
             }
             else
             {
-                function.DisassebleStrings.Add(String.Format("if {4}r({0}) > c[{1}], skip next opcode // if {4}{2} > {3} then skip next line",
+                function.DisassembleStrings.Add(String.Format("if {4}r({0}) > c[{1}], skip next opcode // if {4}{2} > {3} then skip next line",
                     opCode.B,
                     opCode.C,
                     function.Strings[opCode.B].getString(),
@@ -139,7 +138,7 @@ namespace LuaDecompiler
         {
             if (opCode.C > 255)
             {
-                function.DisassebleStrings.Add(String.Format("if {4}r({0}) >= c[{1}], skip next opcode // if {4}{2} >= {3} then skip next line",
+                function.DisassembleStrings.Add(String.Format("if {4}r({0}) >= c[{1}], skip next opcode // if {4}{2} >= {3} then skip next line",
                     opCode.B,
                     opCode.C - 256,
                     function.Registers[opCode.B],
@@ -148,7 +147,7 @@ namespace LuaDecompiler
             }
             else
             {
-                function.DisassebleStrings.Add(String.Format("if {4}r({0}) >= r({1}), skip next opcode // if {4}{2} >= {3} then skip next line",
+                function.DisassembleStrings.Add(String.Format("if {4}r({0}) >= r({1}), skip next opcode // if {4}{2} >= {3} then skip next line",
                     opCode.B,
                     opCode.C,
                     function.Registers[opCode.B],
@@ -161,7 +160,7 @@ namespace LuaDecompiler
         {
             if (opCode.C > 255)
             {
-                function.DisassebleStrings.Add(String.Format("if {4}r({0}) >= c[{1}], skip next opcode // if {4}{2} >= {3} then skip next line",
+                function.DisassembleStrings.Add(String.Format("if {4}r({0}) >= c[{1}], skip next opcode // if {4}{2} >= {3} then skip next line",
                     opCode.B,
                     opCode.C - 256,
                     function.Strings[opCode.B].getString(),
@@ -170,7 +169,7 @@ namespace LuaDecompiler
             }
             else
             {
-                function.DisassebleStrings.Add(String.Format("if {4}r({0}) >= c[{1}], skip next opcode // if {4}{2} >= {3} then skip next line",
+                function.DisassembleStrings.Add(String.Format("if {4}r({0}) >= c[{1}], skip next opcode // if {4}{2} >= {3} then skip next line",
                     opCode.B,
                     opCode.C,
                     function.Strings[opCode.B].getString(),

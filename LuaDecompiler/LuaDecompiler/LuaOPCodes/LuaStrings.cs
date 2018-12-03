@@ -16,7 +16,7 @@ namespace LuaDecompiler
         public static void ConnectWithDot(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
             function.Registers[opCode.A] = function.Registers[opCode.B] + "." + function.Strings[opCode.C].String;
-            function.DisassebleStrings.Add(String.Format("r({0}) = r({1}).field({2}) // {3}",
+            function.DisassembleStrings.Add(String.Format("r({0}) = r({1}).field({2}) // {3}",
                 opCode.A,
                 opCode.B,
                 opCode.C,
@@ -29,7 +29,7 @@ namespace LuaDecompiler
             {
                 if (function.Strings[opCode.C - 256].StringType == LuaFile.StringType.String)
                     isString = true;
-                function.DisassebleStrings.Add(String.Format("r({0}).field(c[{1}]) = c[{2}] // {3}.{4} = {5}",
+                function.DisassembleStrings.Add(String.Format("r({0}).field(c[{1}]) = c[{2}] // {3}.{4} = {5}",
                     opCode.A,
                     opCode.B,
                     opCode.C - 256,
@@ -39,7 +39,7 @@ namespace LuaDecompiler
             }
             else
             {
-                function.DisassebleStrings.Add(String.Format("r({0}).field(c[{1}]) = r({2}) // {3}.{4} = {5}",
+                function.DisassembleStrings.Add(String.Format("r({0}).field(c[{1}]) = r({2}) // {3}.{4} = {5}",
                     opCode.A,
                     opCode.B,
                     opCode.C,
@@ -65,7 +65,7 @@ namespace LuaDecompiler
             }
             output += ")";
             function.Registers[opCode.A] = output;
-            function.DisassebleStrings.Add(String.Format("r({0}) = {1} // {2}",
+            function.DisassembleStrings.Add(String.Format("r({0}) = {1} // {2}",
                 opCode.A,
                 registers,
                 function.Registers[opCode.A]));
@@ -81,7 +81,7 @@ namespace LuaDecompiler
             if (opCode.C > 255)
             {
                 function.Registers[opCode.A] = function.Registers[opCode.B] + ":" + function.Strings[opCode.C - 256].String;
-                function.DisassebleStrings.Add(String.Format("r({0}) = r({1}):c[{2}] // {3}",
+                function.DisassembleStrings.Add(String.Format("r({0}) = r({1}):c[{2}] // {3}",
                     opCode.A,
                     opCode.B,
                     opCode.C - 256,
@@ -91,7 +91,7 @@ namespace LuaDecompiler
             {
                 
                 function.Registers[opCode.A] = function.Registers[opCode.B] + ":" + function.Registers[opCode.C];
-                function.DisassebleStrings.Add(String.Format("r({0}) = r({1}):r({2}) // {3}",
+                function.DisassembleStrings.Add(String.Format("r({0}) = r({1}):r({2}) // {3}",
                     opCode.A,
                     opCode.B,
                     opCode.C,
