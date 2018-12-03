@@ -33,9 +33,11 @@ namespace LuaDecompiler
             string funcName = function.Registers[opCode.A];
             int parameterCount = opCode.B - 1;
             int returnValues = opCode.C - 1;
+            if (returnValues < 0)
+                returnValues = 0;
             string parameterRegisters = "";
             string parametersString = "";
-            if (parameterCount > 0 && returnValues != -1)
+            if (parameterCount > 0)
             {
                 parameterRegisters += opCode.A + 1;
                 for (int j = opCode.A + 2; j <= opCode.A + parameterCount; j++)

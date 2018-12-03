@@ -19,3 +19,10 @@ E:\ReverseEngineering\LuaDecompiler\CoD-Bo3-4-Lua-Disassembler\LuaDecompiler\Lua
 E:\ReverseEngineering\LuaDecompiler\CoD-Bo3-4-Lua-Disassembler\LuaDecompiler\LuaDecompiler\obj\Debug\LuaDecompiler.csproj.CoreCompileInputs.cache
 E:\ReverseEngineering\LuaDecompiler\CoD-Bo3-4-Lua-Disassembler\LuaDecompiler\LuaDecompiler\obj\Debug\LuaDecompiler.exe
 E:\ReverseEngineering\LuaDecompiler\CoD-Bo3-4-Lua-Disassembler\LuaDecompiler\LuaDecompiler\obj\Debug\LuaDecompiler.pdb
+C:\Users\HP Workstation\Documents\GitHub\T7-8-LuaDissassembler\LuaDecompiler\LuaDecompiler\bin\Debug\LuaDecompiler.exe.config
+C:\Users\HP Workstation\Documents\GitHub\T7-8-LuaDissassembler\LuaDecompiler\LuaDecompiler\bin\Debug\LuaDecompiler.exe
+C:\Users\HP Workstation\Documents\GitHub\T7-8-LuaDissassembler\LuaDecompiler\LuaDecompiler\bin\Debug\LuaDecompiler.pdb
+C:\Users\HP Workstation\Documents\GitHub\T7-8-LuaDissassembler\LuaDecompiler\LuaDecompiler\obj\Debug\LuaDecompiler.csprojAssemblyReference.cache
+C:\Users\HP Workstation\Documents\GitHub\T7-8-LuaDissassembler\LuaDecompiler\LuaDecompiler\obj\Debug\LuaDecompiler.csproj.CoreCompileInputs.cache
+C:\Users\HP Workstation\Documents\GitHub\T7-8-LuaDissassembler\LuaDecompiler\LuaDecompiler\obj\Debug\LuaDecompiler.exe
+C:\Users\HP Workstation\Documents\GitHub\T7-8-LuaDissassembler\LuaDecompiler\LuaDecompiler\obj\Debug\LuaDecompiler.pdb

@@ -145,13 +145,14 @@ namespace LuaDecompiler
             }
                 
             for(int i = 0; i < this.Functions.Count; i++)
-                this.disassembleOPCodes(this.Functions[i], i);
+                this.disassembleOPCodes(this.Functions[i], i);   
         }
 
         private void handleSubFunctions(LuaFunction function)
         {
             LuaFunction subFunction = loadFunction(this.inputReader.BaseStream.Position);
             subFunction.superFunction = function;
+            
             function.subFunctions.Add(subFunction);
             for (int i = 0; i < subFunction.subFunctionsCount; i++)
             {
@@ -226,11 +227,11 @@ namespace LuaDecompiler
 
             // Load all function strings
             this.loadFunctionStrings(function);
-            
-            int endingFirst = inputReader.ReadInt32();
+
+            float endingByte = inputReader.ReadInt32();
             float endingSingle = inputReader.ReadSingle();
             function.subFunctionsCount = inputReader.ReadInt32();
-            
+                       
             function.endPosition = inputReader.BaseStream.Position;
             
             Functions.Add(function);

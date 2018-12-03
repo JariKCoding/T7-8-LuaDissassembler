@@ -52,8 +52,9 @@ namespace LuaDecompiler
                     function.forLoopCount++;
                     suffix = " + start of foreach loop";
                 }
-                function.DisassebleStrings.Add(String.Format("skip the next [{0}] opcodes // advance {0} lines",
-                    opCode.C + 1));
+                function.DisassebleStrings.Add(String.Format("skip the next [{0}] opcodes // advance {0} lines{1}",
+                    opCode.C + 1,
+                    suffix));
             }
             else
             {
