@@ -497,6 +497,13 @@ namespace LuaDecompiler
                 catch
                 {
                     Console.WriteLine("Error occured while disassembling A: {3}, B: {4}, C: {5} OPcode: {0:X} at line {1} in function {2}", opCode.OPCode, i, function.getName(), opCode.A, opCode.B, opCode.C);
+                    function.DisassembleStrings.Add(String.Format("Unknown data(A:{0}, B:{1}, C:{2}, Bx:{3}, sBx:{4}, X:{5})",
+                        opCode.A,
+                        opCode.B,
+                        opCode.C,
+                        opCode.Bx,
+                        opCode.sBx,
+                        opCode.OPCode));
                     errors++;
                 }
             }

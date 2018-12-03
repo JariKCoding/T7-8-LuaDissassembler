@@ -56,7 +56,26 @@ namespace LuaDecompiler
 
         public static void SetTableBackwards(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
-            function.DisassembleStrings.Add("; Unhandled OP: (OPCODE_SETTABLE_S_BK)");
+            if (opCode.C > 255)
+            {
+                function.DisassembleStrings.Add(String.Format("r({0})[c[{1}]] = c[{2}] // {3}[{4}] = {5}",
+                    opCode.A,
+                    opCode.B,
+                    opCode.C - 256,
+                    function.Registers[opCode.A],
+                    function.Strings[opCode.B].getString(),
+                    function.Strings[opCode.C - 256].getString()));
+            }
+            else
+            {
+                function.DisassembleStrings.Add(String.Format("r({0})[c[{1}]] = r({2}) // {3}[{4}] = {5}",
+                    opCode.A,
+                    opCode.B,
+                    opCode.C,
+                    function.Registers[opCode.A],
+                    function.Strings[opCode.B].getString(),
+                    function.Registers[opCode.C]));
+            }
         }
 
         public static void EmptyTable(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)

@@ -65,7 +65,7 @@ namespace LuaDecompiler
                     }
                 }
             }
-            else
+            else if(parameterCount != 0)
             {
                 parameterRegisters += opCode.A + 1;
                 for (int j = opCode.A + 2; j <= function.OPCodes[index - 1].A; j++)
