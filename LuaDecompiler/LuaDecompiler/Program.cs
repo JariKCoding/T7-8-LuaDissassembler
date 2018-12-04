@@ -19,6 +19,7 @@ namespace LuaDecompiler
                 LuaFile luaFile = new LuaFile(fileName);
                 luaFile.Disassemble();
                 luaFile.WriteDisassemble(fileName);
+                luaFile.WriteDecompile(fileName);
             }
             if(LuaFile.errors > 0)
                 Console.ReadLine();

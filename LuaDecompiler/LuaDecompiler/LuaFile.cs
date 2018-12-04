@@ -38,10 +38,11 @@ namespace LuaDecompiler
             public List<LuaOPCode> OPCodes { get; set; }
             public List<LuaString> Strings { get; set; }
             public List<String> DisassembleStrings { get; set; }
+            public List<String> DecompileStrings { get; set; }
             public List<String> UpvalsStrings { get; set; }
             public List<int> foreachPositions { get; set; }
             public string[] Registers { get; set; }
-            
+            public string functionName { get; set; }
 
             public LuaFunction(int registerCount)
             {
@@ -50,11 +51,13 @@ namespace LuaDecompiler
                 Strings = new List<LuaString>();
                 subFunctions = new List<LuaFunction>();
                 DisassembleStrings = new List<String>();
+                DecompileStrings = new List<String>();
                 UpvalsStrings = new List<String>();
                 foreachPositions = new List<int>();
                 Registers = new string[registerCount];
                 for (int i = 0; i < registerCount; i++)
                     Registers[i] = "";
+                functionName = "";
                 tableCount = 0;
                 returnValCount = 0;
                 forLoopCount = 0;
@@ -67,10 +70,12 @@ namespace LuaDecompiler
                 return "returnval" + this.returnValCount++;
             }
 
-            public string getName()
+            public string getName(bool getFakeName = false)
             {
                 if (beginPosition <= 0x101)
                     return "__INIT__";
+                else if (getFakeName && functionName != "")
+                    return functionName;
                 else
                     return string.Format("__FUNC_{0:X}_", this.beginPosition);
             }
@@ -186,6 +191,58 @@ namespace LuaDecompiler
                 outputWriter.WriteLine(this.Functions[i].toString());
             }
             outputWriter.Close();
+        }
+
+        public void WriteDecompile(string outputFile)
+        {
+            if (fakeName != "")
+                outputFile = Path.GetDirectoryName(outputFile) + "\\" + fakeName + ".lua";
+            this.outputWriter = new StreamWriter(outputFile + "dc");
+            outputWriter.WriteLine("; Decompiled by LuaDecompiler by JariK\n");
+            functionWriteDecompile(this.Functions[0], 0, true);
+            outputWriter.Close();
+        }
+
+        private void functionWriteDecompile(LuaFunction function, int functionLevel, bool skipHeader = false)
+        {
+            if(!skipHeader)
+            {
+                string funcName = function.getName(true);
+                writeWithRightTabs(functionLevel - 1, "");
+                if (funcName.Substring(0, 4) != "LUI." && funcName.Substring(0, 4) != "CoD.")
+                    outputWriter.Write("local ");
+                outputWriter.Write("function " + funcName + "(");
+                for(int i = 0; i < function.parameterCount; i++)
+                {
+                    outputWriter.Write(((i > 0) ? ", ": "") + "arg" + i);
+                }
+                outputWriter.Write(")\n");
+            }
+
+            for (int i = 0; i < function.DecompileStrings.Count; i++)
+                writeWithRightTabs(functionLevel, function.DecompileStrings[i] + "\n");
+
+            if(!skipHeader)
+            {
+                writeWithRightTabs(functionLevel - 1, "end\n");
+            }
+            outputWriter.Write("\n");
+
+            if(function.getName() == "__INIT__")
+            {
+                for(int i = 0; i < function.subFunctions.Count; i++)
+                {
+                    functionWriteDecompile(function.subFunctions[i], functionLevel+1);
+                }
+            }
+        }
+
+        private void writeWithRightTabs(int index, string opCodeString)
+        {
+            string str = "";
+            for (int i = 0; i < index; i++)
+                str += "\t";
+            outputWriter.Write(str + opCodeString);
         }
 
         private void searchGameVersion()
@@ -333,18 +390,6 @@ namespace LuaDecompiler
             }
         }
 
-        private string getSafeString(LuaFunction function, int index)
-        {
-            string str;
-            if ((index >= function.Registers.Length && index < function.Strings.Count) || function.Registers[index] == "")
-                str = function.Strings[index].String;
-            else if (index < function.Registers.Length)
-                str = function.Registers[index];
-            else
-                str = "<ERROR>";
-            return str;
-        }
-
         private void disassembleOPCodes(LuaFunction function, int index)
         {
             // Add the parameter opcodes because they arent included
@@ -374,7 +419,7 @@ namespace LuaDecompiler
                         case 0xA: LuaTables.GetIndex(function, opCode); break;
                         case 0xD: LuaRegisters.BooleanToRegister(function, opCode); break;
                         case 0xE: LuaLoops.StartForEachLoop(function, opCode); break;
-                        case 0xF: LuaStrings.SetField(function, opCode); break;
+                        case 0xF: LuaStrings.SetField(function, opCode, i); break;
                         case 0x10: LuaTables.SetTable(function, opCode); break;
                         case 0x11: LuaTables.SetTableBackwards(function, opCode); break;
                         case 0x19: LuaRegisters.LocalConstantToRegister(function, opCode); break;
@@ -419,7 +464,7 @@ namespace LuaDecompiler
                         case 0x4F: LuaConditions.IfIsTrueFalse(function, opCode); break;
                         case 0x50: LuaOperators.NotR1(function, opCode); break;
                         case 0x51: LuaStrings.ConnectWithDot(function, opCode); break;
-                        case 0x52: LuaStrings.SetField(function, opCode, true); break;
+                        case 0x52: LuaStrings.SetField(function, opCode, i, true); break;
                         case 0x54:
                             if (function.doingUpvals >= 0)
                             {
@@ -464,7 +509,7 @@ namespace LuaDecompiler
                                 opCode.OPCode));
                             break;
                     }
-                    if (opCode.OPCode == 0xF && function.toString() == "__INIT__")
+                    if (opCode.OPCode == 0xF && function.getName() == "__INIT__")
                     {
                         if (this.game == Game.BlackOps4 && function.Registers[opCode.A].Length > 3)
                         {

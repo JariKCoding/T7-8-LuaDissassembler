@@ -25,9 +25,14 @@ namespace LuaDecompiler
                     returns += ", " + function.Registers[i];
                 }
                 function.DisassembleStrings.Add(String.Format("return r({0}) // {1}", registers, returns));
-            } 
+                function.DecompileStrings.Add("return " + returns);
+            }
             else
+            {
                 function.DisassembleStrings.Add("return");
+                if (index < function.OPCodes.Count - 1)
+                    function.DecompileStrings.Add("return");
+            }
         }
 
         public static void Length(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
@@ -111,6 +116,11 @@ namespace LuaDecompiler
                     function.Strings[opCode.C - 256].String,
                     function.Registers[opCode.B],
                     Operator));
+                function.DecompileStrings.Add(String.Format("local {0} = {1} {2} {3}",
+                    "returnval" + function.returnValCount,
+                    function.Strings[opCode.C - 256].String,
+                    Operator,
+                    function.Registers[opCode.B]));
             }
             else
             {
@@ -122,6 +132,11 @@ namespace LuaDecompiler
                     function.Registers[opCode.C],
                     function.Registers[opCode.B],
                     Operator));
+                function.DecompileStrings.Add(String.Format("local {0} = {1} {2} {3}",
+                    "returnval" + function.returnValCount,
+                    function.Registers[opCode.C],
+                    Operator,
+                    function.Registers[opCode.B]));
             }
 
             function.Registers[opCode.A] = function.getNewReturnVal();
@@ -129,20 +144,25 @@ namespace LuaDecompiler
 
         public static void DoOperatorBackWards(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode, string Operator)
         {
-            function.Registers[opCode.A] = function.getNewReturnVal();
-            function.DisassembleStrings.Add(String.Format("r({0}) = r({1}) {6} c({2}) // {3} = {4} {6} {5}",
+            function.DisassembleStrings.Add(String.Format("r({0}) = c({2}) {6} r({1}) // {3} = {5} {6} {4}",
                 opCode.A,
                 opCode.C,
                 opCode.B,
-                function.Registers[opCode.A],
+                "returnval" + function.returnValCount,
                 function.Registers[opCode.C],
                 function.Strings[opCode.B].String,
                 Operator));
+            function.DecompileStrings.Add(String.Format("local {0} = {1} {2} {3}",
+                "returnval" + function.returnValCount,
+                function.Strings[opCode.B].String,
+                Operator,
+                function.Registers[opCode.C]));
+            function.Registers[opCode.A] = function.getNewReturnVal();
         }
 
         public static void UnaryMinus(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
-            function.Registers[opCode.A] = "-" + function.Registers[opCode.A];
+            function.Registers[opCode.A] = "-" + function.Registers[opCode.B];
             function.DisassembleStrings.Add(String.Format("r({0}) = -r({1}) // {2} ",
                 opCode.A,
                 opCode.B,

@@ -23,7 +23,7 @@ namespace LuaDecompiler
                 function.Registers[opCode.A]));
         }
 
-        public static void SetField(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode, bool isString = false)
+        public static void SetField(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode, int index, bool isString = false)
         {
             if(opCode.C > 255)
             {
@@ -35,10 +35,34 @@ namespace LuaDecompiler
                     opCode.C - 256,
                     function.Registers[opCode.A],
                     function.Strings[opCode.B].String,
-                    (isString) ? "\"" + function.Strings[opCode.C - 256].String + "\"": function.Strings[opCode.C - 256].String));
+                    function.Strings[opCode.C - 256].getString()));
+                function.DecompileStrings.Add(String.Format("{0}.{1} = {2}",
+                    function.Registers[opCode.A],
+                    function.Strings[opCode.B].String,
+                    function.Strings[opCode.C - 256].getString()));
             }
             else
             {
+                if (function.Registers[opCode.C].Contains("__FUNC") 
+                    && (function.OPCodes[index - 1].OPCode == 0x4A || function.OPCodes[index - 1].OPCode == 0x54)
+                    && (function.Registers[opCode.A].Substring(0, 4) == "CoD." || function.Registers[opCode.A].Substring(0, 4) == "LUI."))
+                {
+                    for(int i = index; i > 0; i--)
+                    {
+                        if(function.OPCodes[i].OPCode == 0x4A)
+                        {
+                            function.subFunctions[function.OPCodes[i].Bx].functionName = function.Registers[opCode.A] + "." + function.Strings[opCode.B].String;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    function.DecompileStrings.Add(String.Format("{0}.{1} = {2}",
+                        function.Registers[opCode.A],
+                        function.Strings[opCode.B].String,
+                        (isString) ? "\"" + function.Registers[opCode.C] + "\"" : function.Registers[opCode.C]));
+                }
                 function.DisassembleStrings.Add(String.Format("r({0}).field(c[{1}]) = r({2}) // {3}.{4} = {5}",
                     opCode.A,
                     opCode.B,
@@ -46,6 +70,7 @@ namespace LuaDecompiler
                     function.Registers[opCode.A],
                     function.Strings[opCode.B].String,
                     (isString) ? "\"" + function.Registers[opCode.C] + "\"" : function.Registers[opCode.C]));
+                
             }
         }
 

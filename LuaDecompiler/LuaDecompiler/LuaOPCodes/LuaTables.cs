@@ -41,6 +41,10 @@ namespace LuaDecompiler
                     function.Registers[opCode.A],
                     function.Registers[opCode.B],
                     function.Strings[opCode.C - 256].getString()));
+                function.DecompileStrings.Add(String.Format("{0}[{1}] = {2}",
+                    function.Registers[opCode.A],
+                    function.Registers[opCode.B],
+                    function.Strings[opCode.C - 256].getString()));
             }
             else
             {
@@ -48,6 +52,10 @@ namespace LuaDecompiler
                     opCode.A,
                     opCode.B,
                     opCode.C,
+                    function.Registers[opCode.A],
+                    function.Registers[opCode.B],
+                    function.Registers[opCode.C]));
+                function.DecompileStrings.Add(String.Format("{0}[{1}] = {2}",
                     function.Registers[opCode.A],
                     function.Registers[opCode.B],
                     function.Registers[opCode.C]));
@@ -65,6 +73,10 @@ namespace LuaDecompiler
                     function.Registers[opCode.A],
                     function.Strings[opCode.B].getString(),
                     function.Strings[opCode.C - 256].getString()));
+                function.DecompileStrings.Add(String.Format("{0}[{1}] = {2}",
+                    function.Registers[opCode.A],
+                    function.Strings[opCode.B].getString(),
+                    function.Strings[opCode.C - 256].getString()));
             }
             else
             {
@@ -72,6 +84,10 @@ namespace LuaDecompiler
                     opCode.A,
                     opCode.B,
                     opCode.C,
+                    function.Registers[opCode.A],
+                    function.Strings[opCode.B].getString(),
+                    function.Registers[opCode.C]));
+                function.DecompileStrings.Add(String.Format("{0}[{1}] = {2}",
                     function.Registers[opCode.A],
                     function.Strings[opCode.B].getString(),
                     function.Registers[opCode.C]));
@@ -87,6 +103,8 @@ namespace LuaDecompiler
                 opCode.C,
                 opCode.B,
                 function.Registers[opCode.A], "{}"));
+            function.DecompileStrings.Add(String.Format("local {0} = {1}",
+                    function.Registers[opCode.A], "{}"));
         }
 
         public static void SetList(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
@@ -112,6 +130,9 @@ namespace LuaDecompiler
             function.DisassembleStrings.Add(String.Format("r({0}) = r({1}) // {2} = {3}",
                 opCode.A,
                 tableRegisters,
+                function.Registers[opCode.A],
+                tableString));
+            function.DecompileStrings.Add(String.Format("{0} = {1}",
                 function.Registers[opCode.A],
                 tableString));
         }
