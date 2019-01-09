@@ -113,11 +113,6 @@ namespace LuaDecompiler
                     function.Strings[opCode.C - 256].String,
                     function.Registers[opCode.B],
                     Operator));
-                function.DecompileStrings.Add(String.Format("local {0} = {1} {2} {3}",
-                    "returnval" + function.returnValCount,
-                    function.Strings[opCode.C - 256].String,
-                    Operator,
-                    function.Registers[opCode.B]));
             }
             else
             {
@@ -129,11 +124,6 @@ namespace LuaDecompiler
                     function.Registers[opCode.C],
                     function.Registers[opCode.B],
                     Operator));
-                function.DecompileStrings.Add(String.Format("local {0} = {1} {2} {3}",
-                    "returnval" + function.returnValCount,
-                    function.Registers[opCode.C],
-                    Operator,
-                    function.Registers[opCode.B]));
             }
 
             function.Registers[opCode.A] = function.getNewReturnVal();

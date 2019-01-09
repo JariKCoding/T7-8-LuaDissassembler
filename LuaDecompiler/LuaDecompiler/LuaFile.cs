@@ -41,7 +41,6 @@ namespace LuaDecompiler
             public List<LuaOPCode> OPCodes { get; set; }
             public List<LuaString> Strings { get; set; }
             public List<String> DisassembleStrings { get; set; }
-            public List<String> DecompileStrings { get; set; }
             public List<String> UpvalsStrings { get; set; }
             public List<int> foreachPositions { get; set; }
             public string[] Registers { get; set; }
@@ -54,7 +53,6 @@ namespace LuaDecompiler
                 Strings = new List<LuaString>();
                 subFunctions = new List<LuaFunction>();
                 DisassembleStrings = new List<String>();
-                DecompileStrings = new List<String>();
                 UpvalsStrings = new List<String>();
                 foreachPositions = new List<int>();
                 Registers = new string[registerCount];
@@ -198,58 +196,6 @@ namespace LuaDecompiler
                 outputWriter.WriteLine(this.Functions[i].toString());
             }
             outputWriter.Close();
-        }
-
-        public void WriteDecompile(string outputFile)
-        {
-            if (fakeName != "")
-                outputFile = Path.GetDirectoryName(outputFile) + "\\" + fakeName + ".lua";
-            this.outputWriter = new StreamWriter(outputFile + "dc");
-            outputWriter.WriteLine("; Decompiled by LuaDecompiler by JariK\n");
-            functionWriteDecompile(this.Functions[0], 0, true);
-            outputWriter.Close();
-        }
-
-        private void functionWriteDecompile(LuaFunction function, int functionLevel, bool skipHeader = false)
-        {
-            if(!skipHeader)
-            {
-                string funcName = function.getName(true);
-                writeWithRightTabs(functionLevel - 1, "");
-                if (funcName.Substring(0, 4) != "LUI." && funcName.Substring(0, 4) != "CoD.")
-                    outputWriter.Write("local ");
-                outputWriter.Write("function " + funcName + "(");
-                for(int i = 0; i < function.parameterCount; i++)
-                {
-                    outputWriter.Write(((i > 0) ? ", ": "") + "arg" + i);
-                }
-                outputWriter.Write(")\n");
-            }
-
-            for (int i = 0; i < function.DecompileStrings.Count; i++)
-                writeWithRightTabs(functionLevel, function.DecompileStrings[i] + "\n");
-
-            if(!skipHeader)
-            {
-                writeWithRightTabs(functionLevel - 1, "end\n");
-            }
-            outputWriter.Write("\n");
-
-            if(function.getName() == "__INIT__")
-            {
-                for(int i = 0; i < function.subFunctions.Count; i++)
-                {
-                    functionWriteDecompile(function.subFunctions[i], functionLevel+1);
-                }
-            }
-        }
-
-        private void writeWithRightTabs(int index, string opCodeString)
-        {
-            string str = "";
-            for (int i = 0; i < index; i++)
-                str += "\t";
-            outputWriter.Write(str + opCodeString);
         }
 
         private void searchGameVersion()

@@ -33,5 +33,3 @@ E:\ReverseEngineering\T7-8-LuaDissassembler\LuaDecompiler\LuaDecompiler\obj\Debu
 E:\ReverseEngineering\T7-8-LuaDissassembler\LuaDecompiler\LuaDecompiler\obj\Debug\LuaDecompiler.csproj.CoreCompileInputs.cache
 E:\ReverseEngineering\T7-8-LuaDissassembler\LuaDecompiler\LuaDecompiler\obj\Debug\LuaDecompiler.exe
 E:\ReverseEngineering\T7-8-LuaDissassembler\LuaDecompiler\LuaDecompiler\obj\Debug\LuaDecompiler.pdb
-E:\ReverseEngineering\T7-8-LuaDissassembler\LuaDecompiler\LuaDecompiler\bin\Debug\LZ4.dll
-E:\ReverseEngineering\T7-8-LuaDissassembler\LuaDecompiler\LuaDecompiler\obj\Debug\LuaDecompiler.csproj.CopyComplete
