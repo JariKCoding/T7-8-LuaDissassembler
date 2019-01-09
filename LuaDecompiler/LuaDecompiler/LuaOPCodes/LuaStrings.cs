@@ -59,7 +59,6 @@ namespace LuaDecompiler
                     function.Registers[opCode.A],
                     function.Strings[opCode.B].String,
                     (isString) ? "\"" + function.Registers[opCode.C] + "\"" : function.Registers[opCode.C]));
-                
             }
         }
 

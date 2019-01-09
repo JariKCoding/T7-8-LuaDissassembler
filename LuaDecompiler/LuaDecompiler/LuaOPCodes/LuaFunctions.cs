@@ -106,6 +106,10 @@ namespace LuaDecompiler
                     returnStrings,
                     funcName,
                     parametersString));
+                function.DecompileStrings.Add(String.Format("local {0} = {1}({2})",
+                    returnStrings,
+                    funcName,
+                    parametersString));
             }
             else
             {
@@ -117,6 +121,10 @@ namespace LuaDecompiler
                     funcName,
                     parametersString,
                     (tailCall) ? "return " : ""));
+                function.DecompileStrings.Add(String.Format("{0}{1}({2})",
+                    (tailCall) ? "return " : "",
+                    funcName,
+                    parametersString));
             }
         }
 
@@ -140,6 +148,9 @@ namespace LuaDecompiler
                     opCode.A,
                     returnStrings,
                     function.Registers[opCode.A]));
+                function.DecompileStrings.Add(String.Format("local {0} = {1}()",
+                    returnStrings,
+                    function.Registers[opCode.A]));
                 for (int j = opCode.A; j < opCode.A + opCode.C - 1; j++)
                     function.returnValCount--;
                 function.Registers[opCode.A] = function.getNewReturnVal();
@@ -155,6 +166,8 @@ namespace LuaDecompiler
             {
                 function.DisassembleStrings.Add(String.Format("call r({0}) // {1}()",
                     opCode.A,
+                    function.Registers[opCode.A]));
+                function.DecompileStrings.Add(String.Format("{0}()",
                     function.Registers[opCode.A]));
             }
         }
