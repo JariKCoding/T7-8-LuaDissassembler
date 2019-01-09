@@ -25,9 +25,11 @@ namespace LuaDecompiler
                     returns += ", " + function.Registers[i];
                 }
                 function.DisassembleStrings.Add(String.Format("return r({0}) // {1}", registers, returns));
-            } 
+            }
             else
+            {
                 function.DisassembleStrings.Add("return");
+            }
         }
 
         public static void Length(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
@@ -129,20 +131,20 @@ namespace LuaDecompiler
 
         public static void DoOperatorBackWards(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode, string Operator)
         {
-            function.Registers[opCode.A] = function.getNewReturnVal();
-            function.DisassembleStrings.Add(String.Format("r({0}) = r({1}) {6} c({2}) // {3} = {4} {6} {5}",
+            function.DisassembleStrings.Add(String.Format("r({0}) = c({2}) {6} r({1}) // {3} = {5} {6} {4}",
                 opCode.A,
                 opCode.C,
                 opCode.B,
-                function.Registers[opCode.A],
+                "returnval" + function.returnValCount,
                 function.Registers[opCode.C],
                 function.Strings[opCode.B].String,
                 Operator));
+            function.Registers[opCode.A] = function.getNewReturnVal();
         }
 
         public static void UnaryMinus(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
-            function.Registers[opCode.A] = "-" + function.Registers[opCode.A];
+            function.Registers[opCode.A] = "-" + function.Registers[opCode.B];
             function.DisassembleStrings.Add(String.Format("r({0}) = -r({1}) // {2} ",
                 opCode.A,
                 opCode.B,
@@ -176,7 +178,7 @@ namespace LuaDecompiler
 
         public static void Close(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
-            function.DisassembleStrings.Add("; Unhandled OP: (OPCODE_CLOSE)");
+            function.DisassembleStrings.Add(String.Format("; Unhandled OP: (OPCODE_CLOSE) A: {0}, B: {1}, C: {2}, Bx: {3}", opCode.A, opCode.B, opCode.C, opCode.Bx));
         }
 
         public static void VarArg(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)

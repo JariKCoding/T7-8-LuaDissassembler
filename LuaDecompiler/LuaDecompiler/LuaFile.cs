@@ -13,6 +13,9 @@ namespace LuaDecompiler
         public string fakeName { get; set; }
         public static int errors { get; set; }
 
+        // This makes the program not crash when it gets bo2 files but op codes are different
+        public bool exportBlackOps2 = false;
+
         public Game game { get; set; }
 
         public enum Game { BlackOps4, BlackOps3 };
@@ -41,7 +44,7 @@ namespace LuaDecompiler
             public List<String> UpvalsStrings { get; set; }
             public List<int> foreachPositions { get; set; }
             public string[] Registers { get; set; }
-            
+            public string functionName { get; set; }
 
             public LuaFunction(int registerCount)
             {
@@ -55,6 +58,7 @@ namespace LuaDecompiler
                 Registers = new string[registerCount];
                 for (int i = 0; i < registerCount; i++)
                     Registers[i] = "";
+                functionName = "";
                 tableCount = 0;
                 returnValCount = 0;
                 forLoopCount = 0;
@@ -64,13 +68,19 @@ namespace LuaDecompiler
 
             public string getNewReturnVal()
             {
+                while(this.UpvalsStrings.Contains("returnval" + this.returnValCount))
+                {
+                    this.returnValCount++;
+                }
                 return "returnval" + this.returnValCount++;
             }
 
-            public string getName()
+            public string getName(bool getFakeName = false)
             {
                 if (beginPosition <= 0x101)
                     return "__INIT__";
+                else if (getFakeName && functionName != "")
+                    return functionName;
                 else
                     return string.Format("__FUNC_{0:X}_", this.beginPosition);
             }
@@ -158,9 +168,9 @@ namespace LuaDecompiler
             {
                 this.handleSubFunctions(this.Functions[0]);
             }
-                
-            for(int i = 0; i < this.Functions.Count; i++)
-                this.disassembleOPCodes(this.Functions[i], i);   
+
+            for (int i = 0; i < this.Functions.Count; i++)
+                this.disassembleOPCodes(this.Functions[i], i);
         }
 
         private void handleSubFunctions(LuaFunction function)
@@ -229,8 +239,9 @@ namespace LuaDecompiler
             function.upvalsCount = upvalsCount;
             function.parameterCount = parameterCount;
 
-            // Some unknown bytes
-            inputReader.ReadBytes(4);
+            // Some unknown bytes (BO3 and BO4)
+            if(!exportBlackOps2)
+                inputReader.ReadBytes(4);
             
             // Add extra bytes to make it line up
             int extra = 4 - ((int)this.inputReader.BaseStream.Position % 4);
@@ -315,13 +326,24 @@ namespace LuaDecompiler
                         break;
                     case 4:
                         int StringLength = inputReader.ReadInt32() - 1;
-                        inputReader.ReadInt32();
+                        if (!exportBlackOps2)
+                            inputReader.ReadInt32();
                         str.String = inputReader.ReadNullTerminatedString();
                         str.StringType = StringType.String;
                         break;
                     case 0xD:
-                        str.String = String.Format("{0:X}", inputReader.ReadInt64() & 0xFFFFFFFFFFFFFFF);
-                        str.StringType = StringType.hash;
+                        string HashString;
+                        ulong assetHash = inputReader.ReadUInt64() & 0xFFFFFFFFFFFFFFF;
+                        if (!Program.AssetNameCache.Entries.TryGetValue(assetHash, out HashString))
+                        {
+                            str.String = String.Format("0x{0:X}", assetHash);
+                            str.StringType = StringType.hash;
+                        }
+                        else
+                        {
+                            str.String = HashString;
+                            str.StringType = StringType.String;
+                        }
                         break;
                     case 0:
                         str.String = "nil";
@@ -331,18 +353,6 @@ namespace LuaDecompiler
                 // Add it to the list
                 function.Strings.Add(str);
             }
-        }
-
-        private string getSafeString(LuaFunction function, int index)
-        {
-            string str;
-            if ((index >= function.Registers.Length && index < function.Strings.Count) || function.Registers[index] == "")
-                str = function.Strings[index].String;
-            else if (index < function.Registers.Length)
-                str = function.Registers[index];
-            else
-                str = "<ERROR>";
-            return str;
         }
 
         private void disassembleOPCodes(LuaFunction function, int index)
@@ -374,7 +384,7 @@ namespace LuaDecompiler
                         case 0xA: LuaTables.GetIndex(function, opCode); break;
                         case 0xD: LuaRegisters.BooleanToRegister(function, opCode); break;
                         case 0xE: LuaLoops.StartForEachLoop(function, opCode); break;
-                        case 0xF: LuaStrings.SetField(function, opCode); break;
+                        case 0xF: LuaStrings.SetField(function, opCode, i); break;
                         case 0x10: LuaTables.SetTable(function, opCode); break;
                         case 0x11: LuaTables.SetTableBackwards(function, opCode); break;
                         case 0x19: LuaRegisters.LocalConstantToRegister(function, opCode); break;
@@ -419,7 +429,7 @@ namespace LuaDecompiler
                         case 0x4F: LuaConditions.IfIsTrueFalse(function, opCode); break;
                         case 0x50: LuaOperators.NotR1(function, opCode); break;
                         case 0x51: LuaStrings.ConnectWithDot(function, opCode); break;
-                        case 0x52: LuaStrings.SetField(function, opCode, true); break;
+                        case 0x52: LuaStrings.SetField(function, opCode, i ); break;
                         case 0x54:
                             if (function.doingUpvals >= 0)
                             {
@@ -464,14 +474,27 @@ namespace LuaDecompiler
                                 opCode.OPCode));
                             break;
                     }
-                    if (opCode.OPCode == 0xF && function.toString() == "__INIT__")
+                    if ((opCode.OPCode == 0xF || opCode.OPCode == 0x52) && function.getName() == "__INIT__")
                     {
-                        if (this.game == Game.BlackOps4 && function.Registers[opCode.A].Length > 3)
+                        if (this.game == Game.BlackOps4 && function.Registers[opCode.A].Length  == 14)
                         {
-                            if ((function.Registers[opCode.A].Substring(0, 4) == "CoD." || function.Registers[opCode.A].Substring(0, 4) == "LUI.") &&
-                                function.Strings[opCode.B].String == "new")
+                            if(function.Registers[opCode.A] == "LUI.createMenu")
+                                fakeName = function.Strings[opCode.B].String;
+                        }
+                        else if (this.game == Game.BlackOps4 && function.Registers[opCode.A].Length > 3)
+                        {
+                            if ((function.Registers[opCode.A].Substring(0, 4) == "CoD." || function.Registers[opCode.A].Substring(0, 4) == "LUI." || function.Registers[opCode.A].Substring(0, 6) == "Lobby.") &&
+                                (function.Strings[opCode.B].String == "new"))
                             {
                                 fakeName = function.Registers[opCode.A].Substring(4);
+                            }
+                        }
+                        else if (this.game == Game.BlackOps4 && function.Registers[opCode.A].Length < 4)
+                        {
+                            if ((function.Registers[opCode.A] == "CoD" || function.Registers[opCode.A] == "LUI") &&
+                                (function.Registers[opCode.C] == "table0"))
+                            {
+                                fakeName = function.Strings[opCode.B].String;
                             }
                         }
                     }

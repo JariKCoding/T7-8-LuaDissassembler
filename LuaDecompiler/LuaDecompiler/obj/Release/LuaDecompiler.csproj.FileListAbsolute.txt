@@ -1,0 +1,8 @@
+E:\ReverseEngineering\T7-8-LuaDissassembler\LuaDecompiler\LuaDecompiler\bin\Release\LuaDecompiler.exe.config
+E:\ReverseEngineering\T7-8-LuaDissassembler\LuaDecompiler\LuaDecompiler\bin\Release\LuaDecompiler.exe
+E:\ReverseEngineering\T7-8-LuaDissassembler\LuaDecompiler\LuaDecompiler\bin\Release\LuaDecompiler.pdb
+E:\ReverseEngineering\T7-8-LuaDissassembler\LuaDecompiler\LuaDecompiler\bin\Release\LZ4.dll
+E:\ReverseEngineering\T7-8-LuaDissassembler\LuaDecompiler\LuaDecompiler\obj\Release\LuaDecompiler.csproj.CoreCompileInputs.cache
+E:\ReverseEngineering\T7-8-LuaDissassembler\LuaDecompiler\LuaDecompiler\obj\Release\LuaDecompiler.csproj.CopyComplete
+E:\ReverseEngineering\T7-8-LuaDissassembler\LuaDecompiler\LuaDecompiler\obj\Release\LuaDecompiler.exe
+E:\ReverseEngineering\T7-8-LuaDissassembler\LuaDecompiler\LuaDecompiler\obj\Release\LuaDecompiler.pdb
