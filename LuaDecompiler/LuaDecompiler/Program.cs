@@ -12,17 +12,35 @@ namespace LuaDecompiler
 
         static void Main(string[] args)
         {
-            string[] files = args.Where(x => (Path.GetExtension(x) == ".lua" || Path.GetExtension(x) == ".luac") && File.Exists(x)).ToArray();
+            
             AssetNameCache = new PackageIndex();
-            AssetNameCache.Load("PackageIndex\\bo4_localizedstrings.wni");
-            AssetNameCache.Load("PackageIndex\\bo4_enums.wni");
-            AssetNameCache.Load("PackageIndex\\bo4_functions.wni");
-            AssetNameCache.Load("PackageIndex\\bo4_materials.wni");
+            AssetNameCache.Load(AppDomain.CurrentDomain.BaseDirectory + "\\PackageIndex\\bo4_localizedstrings.wni");
+            AssetNameCache.Load(AppDomain.CurrentDomain.BaseDirectory + "\\PackageIndex\\bo4_enums.wni");
+            AssetNameCache.Load(AppDomain.CurrentDomain.BaseDirectory + "\\PackageIndex\\bo4_functions.wni");
+            AssetNameCache.Load(AppDomain.CurrentDomain.BaseDirectory + "\\PackageIndex\\bo4_materials.wni");
             Console.WriteLine("Bo3/4 Lua Disassembler by JariK");
             LuaFile.errors = 0;
-            foreach (string fileName in files)
-            //foreach (string fileName in Directory.GetFiles(@"E:\ReverseEngineering\Bo4HashFinder\Bo4HashFinder\bin\Debug\LuaFile", "*.lua", SearchOption.AllDirectories))
+            string[] files = new string[1];
+            if (args.Length == 0)
             {
+                Console.WriteLine("Give the folder that you want to decompile: ");
+                string folder = Console.ReadLine();
+                if (Directory.Exists(folder))
+                {
+                    files = Directory.GetFiles(folder, "*.lua*", SearchOption.AllDirectories);
+                }
+            }
+            else
+            {
+                files = args.Where(x => (Path.GetExtension(x) == ".lua" || Path.GetExtension(x) == ".luac") && File.Exists(x)).ToArray();
+            }
+            
+            foreach (string fileName in files)
+            {
+                if(Path.GetExtension(fileName) != ".lua" && Path.GetExtension(fileName) != ".luac")
+                {
+                    continue;
+                }
                 Console.WriteLine("Exporting file: " + Path.GetFileName(fileName));
                 LuaFile luaFile = new LuaFile(fileName);
                 luaFile.Disassemble();

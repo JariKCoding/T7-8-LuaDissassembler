@@ -166,14 +166,15 @@ namespace LuaDecompiler.LuaDecompile
             return new LuaDecompiler.DecompiledOPCode(LuaDecompiler.opCodeType.String,"-- Unhandled OP: (OPCODE_TESTSET)");
         }
 
-        public static LuaDecompiler.DecompiledOPCode Close(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
+        public static void Close(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
-            return new LuaDecompiler.DecompiledOPCode(LuaDecompiler.opCodeType.String, String.Format("-- Unhandled OP: (OPCODE_CLOSE) A: {0}, B: {1}, C: {2}, Bx: {3}", opCode.A, opCode.B, opCode.C, opCode.Bx));
+            function.Registers[opCode.A] = "";
         }
 
-        public static LuaDecompiler.DecompiledOPCode VarArg(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
+        public static void VarArg(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
-            return new LuaDecompiler.DecompiledOPCode(LuaDecompiler.opCodeType.String,"-- Unhandled OP: (OPCODE_VARARG)");
+            
+            function.Registers[opCode.A] = "...";
         }
 
         public static LuaDecompiler.DecompiledOPCode NotR1(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)

@@ -48,7 +48,10 @@ namespace LuaDecompiler
         {
             // Check if we found a better name (Bo4 hashes)
             if (luaFile.fakeName != "")
-                outputFile = Path.GetDirectoryName(outputFile) + "\\" + luaFile.fakeName + ".lua";
+                //outputFile = Path.GetDirectoryName(outputFile) + "\\export/" + luaFile.fakeName + ".lua";
+                outputFile = Path.GetDirectoryName(outputFile) + luaFile.fakeName + ".lua";
+            //else
+                //outputFile = Path.GetDirectoryName(outputFile) + "\\export/" + Path.GetFileNameWithoutExtension(outputFile) + ".lua";
             // Make a new StreamWriter
             this.outputWriter = new StreamWriter(outputFile + "dc");
             outputWriter.WriteLine("-- Decompiled by LuaDecompiler by JariK\n");
@@ -94,6 +97,12 @@ namespace LuaDecompiler
                     function.Registers[index] = "arg" + jj;
                     outputWriter.Write(((index > 0) ? ", " : "") + "arg" + jj++);
                     index++;
+                }
+                if (function.usesVarArg)
+                {
+                    if (function.parameterCount > 0)
+                        outputWriter.Write(", ");
+                    outputWriter.Write("...");
                 }
                 outputWriter.Write(")\n");
             }
@@ -235,9 +244,9 @@ namespace LuaDecompiler
                     case 0x45: DecompileString = LuaDecompile.LuaOperators.TestSet(function, opCode); break;
                     case 0x46: DecompileString = LuaDecompile.LuaLoops.StartForLoop(function, opCode); break;
                     case 0x48: DecompileString = LuaDecompile.LuaTables.SetList(function, opCode); break;
-                    case 0x49: DecompileString = LuaDecompile.LuaOperators.Close(function, opCode); break;
+                    case 0x49: LuaDecompile.LuaOperators.Close(function, opCode); break;
                     case 0x4A: LuaDecompile.LuaFunctions.Closure(function, opCode, index, functionLevel, this); break;
-                    case 0x4B: DecompileString = LuaDecompile.LuaOperators.VarArg(function, opCode); break;
+                    case 0x4B: LuaDecompile.LuaOperators.VarArg(function, opCode); break;
                     case 0x4D: DecompileString = LuaDecompile.LuaFunctions.CallFunctionWithoutParameters(function, opCode, index); break;
                     case 0x4F: DecompileString = LuaDecompile.LuaConditions.IfIsTrueFalse(function, opCode, index); break;
                     case 0x50: DecompileString = LuaDecompile.LuaOperators.NotR1(function, opCode); break;

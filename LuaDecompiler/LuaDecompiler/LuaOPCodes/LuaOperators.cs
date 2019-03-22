@@ -178,12 +178,16 @@ namespace LuaDecompiler
 
         public static void Close(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
-            function.DisassembleStrings.Add(String.Format("; Unhandled OP: (OPCODE_CLOSE) A: {0}, B: {1}, C: {2}, Bx: {3}", opCode.A, opCode.B, opCode.C, opCode.Bx));
+            function.Registers[opCode.A] = "";
+            function.DisassembleStrings.Add(String.Format("r({0}) = null", opCode.A));
         }
 
         public static void VarArg(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)
         {
-            function.DisassembleStrings.Add("; Unhandled OP: (OPCODE_VARARG)");
+            function.Registers[opCode.A] = "...";
+            function.DisassembleStrings.Add(String.Format("r({0}) = VarArg // {1} ",
+                opCode.A,
+                function.Registers[opCode.A]));
         }
 
         public static void NotR1(LuaFile.LuaFunction function, LuaFile.LuaOPCode opCode)

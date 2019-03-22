@@ -33,17 +33,6 @@ namespace LuaDecompiler.LuaDecompile
                 tailCall = true;
             }
 
-            if(index > 0)
-            {
-                if(function.OPCodes[index + 1].OPCode == 0x2 || function.OPCodes[index + 1].OPCode == 0x4C || function.OPCodes[index + 1].OPCode == 0x16)
-                {
-                    if(function.OPCodes[index + 1].B == 0)
-                    {
-                        //Console.WriteLine("Found parameter func " + funcName);
-                    }
-                }
-            }
-
             string parameterRegisters = "";
             string parametersString = "";
             if (parameterCount > 0)

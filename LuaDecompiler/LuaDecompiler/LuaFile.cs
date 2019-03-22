@@ -28,6 +28,7 @@ namespace LuaDecompiler
             public int registerCount { get; set; }
             public int opcodesCount { get; set; }
             public int parameterCount { get; set; }
+            public bool usesVarArg { get; set; }
             public long beginPosition { get; set; }
             public long endPosition { get; set; }
             public int subFunctionsCount { get; set; }
@@ -97,6 +98,12 @@ namespace LuaDecompiler
                     output += "arg0";
                     for(int i = 1; i < parameterCount; i++)
                         output += ", arg" + i;
+                }
+                if (this.usesVarArg)
+                {
+                    if(this.parameterCount > 0)
+                        output += ", ";
+                    output += "...";
                 }
                 output += ")";
                 for (int i = 0; i < this.Strings.Count; i++)
@@ -188,7 +195,15 @@ namespace LuaDecompiler
         public void WriteDisassemble(String outputFile)
         {
             if (fakeName != "")
-                outputFile = Path.GetDirectoryName(outputFile) + "\\" + fakeName + ".lua";
+            {
+                //File.AppendAllText(@"names.csv", Path.GetFileNameWithoutExtension(outputFile).Replace("LuaFile_", "") + "," + fakeName + Environment.NewLine);
+                //outputFile = Path.GetDirectoryName(outputFile) + "\\export/" + fakeName + ".lua";
+                outputFile = Path.GetDirectoryName(outputFile) + fakeName + ".lua";
+            }
+            /*else
+            {
+                //outputFile = Path.GetDirectoryName(outputFile) + "\\export/" + Path.GetFileNameWithoutExtension(outputFile) + ".lua";
+            }*/
             this.outputWriter = new StreamWriter(outputFile + "dec");
             outputWriter.WriteLine("; Disassembled by LuaDecompiler by JariK\n");
             for(int i=0; i < this.Functions.Count; i++)
@@ -224,9 +239,16 @@ namespace LuaDecompiler
             if (beginPosition < 0x110)
                 parameterCount = 0;
 
-            // Some unknown bytes
+            // VarArg bytes if 
+            bool usesVarArg = false;
             if (beginPosition > 0x110)
-                inputReader.ReadBytes(4);
+            {
+                int varArgBytes = inputReader.ReadInt32();
+                if(varArgBytes != 0)
+                {
+                    usesVarArg = true;
+                }
+            }
 
             // Get some info about this function
             int registerCount = inputReader.ReadInt32();
@@ -238,6 +260,7 @@ namespace LuaDecompiler
             function.opcodesCount = opcodesCount;
             function.upvalsCount = upvalsCount;
             function.parameterCount = parameterCount;
+            function.usesVarArg = usesVarArg;
 
             // Some unknown bytes (BO3 and BO4)
             if(!exportBlackOps2)
